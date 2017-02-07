@@ -13,6 +13,16 @@ public class StdBoard implements Board {
   // ATTRIBUTS
   
   /**
+  * La pile qui enregistre les actions effectuées
+  */
+  private Deque u;
+  
+  /**
+  * La pile qui enregistre les actions refaites
+  */
+  private Deque r;
+  
+  /**
    * Le nombre de lignes sur le plateau.
    */
   private int rowNb; 
