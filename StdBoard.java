@@ -118,6 +118,72 @@ public class StdBoard implements Board {
   
   @Override
   public void move(Vehicle vehicle, Coord coord) {
+    moveWithoutClear(vehicle, coord);
+    r.clear();
+  }
+  
+  @Override
+  public void move(Coord c1, Coord c2) {
+    move(getVehicle(c1), c2);
+  }
+  
+  @Override
+  public void placeVehicles(Card card) {
+    //vehicleMap.clear()
+    //vehicleMap.putAll(card.getPlace());
+    coordMap.clear();
+    for (Vehicle vehicle : vehicleMap.keySet()) {
+      for (Coord coord : vehicleMap.get(vehicle)) {
+        coordMap.put(coord, vehicle);
+      }
+    }
+    
+  }
+  
+  public void undo() {
+    // mettre les tests sur ???
+    Duo d = u.pop;
+    r.push(d);
+    moveWithoutClear(d.getSecondCoord(), d.getFirstCoord());
+  }
+  
+  public void redo() {
+    Duo d = r.pop;
+    u.push(d);
+    moveWithoutClear(d.getFirstCoord(), d.getSecondCoord());
+  }
+  
+  public boolean isValidCol(int col) {
+    return 0 <= col && col <= getColNb();
+  }
+    
+  public boolean isValidRow(int row) {
+    return 0 <= row && row <= getRowNb(); 
+  }
+  
+  // OUTILS
+  
+  private class Duo {
+
+	  private Coord first;
+	  private Coord second;
+	
+	  public Duo(Coord c1, Coord c2) {
+		  first = c1;
+		  second = c2;
+	  }
+
+	  public Coord getFirstCoord() {
+		  return c1;
+	  }
+
+	  public Coord getSecondCoord() {
+		  return c2;
+	  }
+
+  }
+  
+  private void moveWithoutClear(Vehicle vehicle, Coord coord) {
     Contract.checkCondition(canMoveTo(vehicle, coord),
         "cette action n'est pas possible");
     Contract.checkCondition(vehicleMap.get(vehicle) != null,
@@ -167,32 +233,7 @@ public class StdBoard implements Board {
     }
     for (int i = 0; i < newCoords.size(); i++) {
       coordMap.put(newCoords.get(i), vehicle);  
-    }   
-  }
-  
-  @Override
-  public void move(Coord c1, Coord c2) {
-    move(getVehicle(c1), c2);
-  }
-  
-  @Override
-  public void placeVehicles(Card card) {
-    //vehicleMap.clear()
-    //vehicleMap.putAll(card.getPlace());
-    coordMap.clear();
-    for (Vehicle vehicle : vehicleMap.keySet()) {
-      for (Coord coord : vehicleMap.get(vehicle)) {
-        coordMap.put(coord, vehicle);
-      }
     }
-    
   }
   
-  public boolean isValidCol(int col) {
-    return 0 <= col && col <= getColNb();
-  }
-    
-  public boolean isValidRow(int row) {
-    return 0 <= row && row <= getRowNb(); 
-  }
 }
