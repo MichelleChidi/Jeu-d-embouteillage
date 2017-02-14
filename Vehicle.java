@@ -21,7 +21,7 @@ package source;
  *
  */
 
-public interface Vehicle {
+public interface Vehicle implements Comparable<Vehicle> {
   
   //CONSTANTES
   static final int TRUCK_SIZE = 3;
@@ -61,6 +61,8 @@ public interface Vehicle {
   /**
    * Indique si cette coordonnée est similaire à coord. 
    */
-  boolean equals(Object vechile);
+  boolean equals(Object vehicle);
+  
+  int compareTo(Vehicle v);
 }
 
