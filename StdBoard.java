@@ -15,12 +15,12 @@ public class StdBoard implements Board {
   /**
   * La pile qui enregistre les actions effectuées
   */
-  private Deque u;
+  private Deque<Duo> u;
   
   /**
   * La pile qui enregistre les actions refaites
   */
-  private Deque r;
+  private Deque<Duo> r;
   
   /**
    * Le nombre de lignes sur le plateau.
@@ -71,8 +71,8 @@ public class StdBoard implements Board {
     this.exit = exit;
     vehicleMap = new HashMap<Vehicle, List<Coord>>();
     coordMap = new HashMap<Coord, Vehicle>();
-    u = new ArrayDeque();
-    r = new ArrayDeque(); 	  
+    u = new ArrayDeque<Duo>();
+    r = new ArrayDeque<Duo>(); 	  
   }
   
   @Override
