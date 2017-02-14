@@ -150,4 +150,8 @@ public interface Board {
    *
    */
   void placeVehicles(Card card);
+  
+  void undo();
+  
+  void redo();
 }
