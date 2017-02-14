@@ -70,7 +70,9 @@ public class StdBoard implements Board {
     this.rowNb = rowNb;
     this.exit = exit;
     vehicleMap = new HashMap<Vehicle, List<Coord>>();
-    coordMap = new HashMap<Coord, Vehicle>(); 
+    coordMap = new HashMap<Coord, Vehicle>();
+    u = new ArrayDeque();
+    r = new ArrayDeque(); 	  
   }
   
   @Override
