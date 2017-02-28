@@ -7,26 +7,21 @@ public class StdVehicle implements Vehicle {
   
   //ATTRIBUTS
   private int size;
-  private Direction direction; 
-  private Board board; 
+  private Direction direction;  
   private static int id = 0; 
   
   // CONSTRUCTEUR
   
   /**
-   * Construire un véhicule.
+   * Construire un vÃ©hicule.
    */
-  public StdVehicle(int size, Direction dir, Board board) {
+  public StdVehicle(int size, Direction dir) {
     Contract.checkCondition(TRUCK_SIZE == size || size == CAR_SIZE,
         "Taille invalide");
     Contract.checkCondition(dir != null,
-        "direction invalide");
-    Contract.checkCondition(board != null,
-        "plateau invalid");
-    
+        "direction invalide");    
     this.size = size;
     direction = dir; 
-    this.board = board;
     id++;
   }
   
@@ -49,21 +44,11 @@ public class StdVehicle implements Vehicle {
   public int getId() {
     return id;
   }
-
-  @Override
-  public Board getBoard() {
-    return board;
-  }
-  
- // @Override
-  //public Coord getPosition() {
-   // return board.getCoord(this);
-  //}
   
   @Override
   public boolean equals(Object vehicle) {  
     if (vehicle != null && vehicle.getClass() == getClass()) {
-      Vehicles newVech = (Vehicles) vehicle;
+      Vehicle newVech = (Vehicle) vehicle;
       return newVech.getId() == this.getId(); 
     }
     return false;
@@ -72,5 +57,11 @@ public class StdVehicle implements Vehicle {
   public int hashCode() {
     return getId();
   }
+
+	@Override
+	public int compareTo(Vehicle v) {
+		// ascending order
+		return this.getId() - v.getId();
+	}
 }
 
