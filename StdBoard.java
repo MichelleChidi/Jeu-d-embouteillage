@@ -2,6 +2,8 @@ package source;
 
 import util.Contract;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +15,7 @@ public class StdBoard implements Board {
   // ATTRIBUTS
   
   /**
-  * La pile qui enregistre les actions effectuées
+  * La pile qui enregistre les actions effectuÃ©es
   */
   private Deque<Duo> u;
   
@@ -33,12 +35,12 @@ public class StdBoard implements Board {
   private int columnNb;
   
   /**
-   * La coordonnée de la sortie.
+   * La coordonnÃ©e de la sortie.
    */
   private Coord exit;
   
   /**
-   * maps de tous les véhicules et ses coordonnées
+   * maps de tous les vÃ©hicules et ses coordonnÃ©es
    * dans le plateau.
    */
   private Map<Vehicle, List<Coord>> vehicleMap; 
@@ -47,7 +49,7 @@ public class StdBoard implements Board {
   // CONSTRUCTEURS
   
   /**
-   * Créer un plateau de jeu par défaut.
+   * CrÃ©er un plateau de jeu par dÃ©faut.
    */
   public StdBoard() {
     columnNb = DEFAULT;
@@ -56,7 +58,7 @@ public class StdBoard implements Board {
   }
   
   /**
-   * Modéliser un plateau de jeu.
+   * ModÃ©liser un plateau de jeu.
    */
   public StdBoard(int colNb, int rowNb, Coord exit) {
     Contract.checkCondition(DEFAULT <= colNb && colNb <= MAX,
@@ -110,8 +112,8 @@ public class StdBoard implements Board {
 
   @Override
   public boolean canMoveTo(Vehicle vehicle, Coord coord) {
-    Contract.checkCondition(vehicle != null, "Ce véhicule n'existe pas");
-    Contract.checkCondition(coord != null, "Cette coordonnée est nulle");
+    Contract.checkCondition(vehicle != null, "Ce vÃ©hicule n'existe pas");
+    Contract.checkCondition(coord != null, "Cette coordonnÃ©e est nulle");
     return coord.isAlignedWith(vehicleMap.get(vehicle).get(0), vehicle.getDirection()) 
         && isFree(coord);
   }
@@ -121,6 +123,9 @@ public class StdBoard implements Board {
   @Override
   public void move(Vehicle vehicle, Coord coord) {
     moveWithoutClear(vehicle, coord);
+    // Ajoute le mouvement au deque des undo, peut provoquer un problème 
+    // à cause des coordonnées du véhicule
+    u.push(new Duo(getCoord(vehicle).get(0), coord));
     r.clear();
   }
   
@@ -131,8 +136,9 @@ public class StdBoard implements Board {
   
   @Override
   public void placeVehicles(Card card) {
-    //vehicleMap.clear()
-    //vehicleMap.putAll(card.getPlace());
+	// est-ce bon ?
+    vehicleMap.clear();
+    vehicleMap.putAll(card.getPlace());
     coordMap.clear();
     for (Vehicle vehicle : vehicleMap.keySet()) {
       for (Coord coord : vehicleMap.get(vehicle)) {
@@ -144,15 +150,15 @@ public class StdBoard implements Board {
   
   public void undo() {
     // mettre les tests sur ???
-    Duo d = u.pop;
+    Duo d = u.pop();
     r.push(d);
-    moveWithoutClear(d.getSecondCoord(), d.getFirstCoord());
+    moveWithoutClear(getVehicle(d.getSecondCoord()), d.getFirstCoord());
   }
   
   public void redo() {
-    Duo d = r.pop;
+    Duo d = r.pop();
     u.push(d);
-    moveWithoutClear(d.getFirstCoord(), d.getSecondCoord());
+    moveWithoutClear(getVehicle(d.getFirstCoord()), d.getSecondCoord());
   }
   
   public boolean isValidCol(int col) {
@@ -176,11 +182,11 @@ public class StdBoard implements Board {
 	  }
 
 	  public Coord getFirstCoord() {
-		  return c1;
+		  return first;
 	  }
 
 	  public Coord getSecondCoord() {
-		  return c2;
+		  return second;
 	  }
 
   }
@@ -192,15 +198,15 @@ public class StdBoard implements Board {
         "ce vehicule n'existe pas");
     Contract.checkCondition(coord.isValidCol(coord.getCol()) 
         && isValidRow(coord.getRow()),
-        "cette coordonée n'est pas valide");
+        "cette coordonÃ©e n'est pas valide");
     List<Coord> oldCoord = vehicleMap.get(vehicle); 
-    // Ancienne première coordonnée du véhicule
+    // Ancienne premiÃ¨re coordonnÃ©e du vÃ©hicule
     Coord c3 = oldCoord.get(0);
-    // Ancienne dernière coordonnée du véhicule
+    // Ancienne derniÃ¨re coordonnÃ©e du vÃ©hicule
     Coord c4 = oldCoord.get(vehicle.getSize() - 1);
     
-    // Calculer laquelle des 2 anciennes coordonnées 
-    // est la plus proche de la coordonnée indiquée
+    // Calculer laquelle des 2 anciennes coordonnÃ©es 
+    // est la plus proche de la coordonnÃ©e indiquÃ©e
     List<Coord> newCoords = new LinkedList<Coord>(); 
     if (vehicle.getDirection() == Direction.HORIZONTAL) {
       if (Math.abs(c3.getCol() - coord.getCol()) < Math.abs(c4.getCol() - coord.getCol())) {
