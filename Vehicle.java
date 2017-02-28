@@ -2,11 +2,10 @@ package source;
 
 
 /**
- * Modélise les véhicules.
+ * ModÃ©lise les vÃ©hicules.
  * 
  * @inv  
  *      CAR_SIZE <= getSize() <= TRUCK_SIZE
- *      getBoard() != null
  *      0 <= id() < 16
  *      getDirection().equals(HORIZONTAL) ||
  *      getDirection().equals(VERTICAL)
@@ -17,11 +16,9 @@ package source;
  *      $PRE$ CAR_SIZE <= size <= TRUCK_SIZE
  *      getDirection().equals(HORIZONTAL) ||
  *      getDirection().equals(VERTICAL)
- *      board != null
- *
  */
 
-public interface Vehicle implements Comparable<Vehicle> {
+public interface Vehicle extends Comparable<Vehicle> {
   
   //CONSTANTES
   static final int TRUCK_SIZE = 3;
@@ -29,40 +26,29 @@ public interface Vehicle implements Comparable<Vehicle> {
   
   // REQUETES
   /**
-   * retourne la taille de véhicule.
+   * retourne la taille de vÃ©hicule.
    */
   int getSize(); 
 
   /**
-   * retourne la direction de véhicle.
+   * retourne la direction de vÃ©hicle.
    */
   Direction getDirection(); 
 
   /**
-   * Indique si le véhicule est rouge.
+   * Indique si le vÃ©hicule est rouge.
    */
   boolean isRed(); 
 
   /**
-   * Identification de véhicule. 
+   * Identification de vÃ©hicule. 
    */
   int getId();
   
   /**
-   * retourne le plateu où ce véhicule se situe.
-   */
-  Board getBoard(); 
-  
-  /**
-   * retourne la position de ce véhicule.
-   */
-  //Coord getPosition(); 
-  
-  /**
-   * Indique si cette coordonnée est similaire à coord. 
+   * Indique si cette coordonnÃ©e est similaire Ã  coord. 
    */
   boolean equals(Object vehicle);
   
   int compareTo(Vehicle v);
 }
-
