@@ -1,10 +1,13 @@
 package source;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Modélise un éditeur/créateur de carte basique
+ * ModÃ©lise un Ã©diteur/crÃ©ateur de carte basique
  * permettant de sauvegarder une carte dans un fichier
  * ou de charger une carte
  * 
@@ -12,31 +15,34 @@ import java.util.Map;
  * @cons <pre>
  * $ARGS$ File f
  * $PRE$  f != null
- * $POST$ getPlace() est une représentation des informations de f
+ * $POST$ getPlace() est une reprÃ©sentation des informations de f
  */
-public interface ICard {
+public interface Card {
 
 	// REQUETES
 	
 	/**
-	 * Renvoie une map entre les véhicules et les coordonnées des véhicules
+	 * Renvoie une map entre les vÃ©hicules et les coordonnÃ©es des vÃ©hicules
 	 */
-	Map<IVehicle,List<Coord>> getPlace();
+	Map<Vehicle,List<Coord>> getPlace();
 	
 	/**
-	 * Renvoie le fichier attaché a cet éditeur de carte
+	 * Renvoie le fichier attachÃ© a cet Ã©diteur de carte
 	 */
 	File getFile();
 	
 	// COMMANDS
 	
 	/**
-	 * Enregistre les données de la carte dans un fichier de nom s 
+	 * Enregistre les donnÃ©es de la carte dans un fichier de nom s 
+	 * @throws IOException 
 	 */
-	void save(String s);
+	void save(String s) throws IOException;
 	
 	/**
-	 * Charge les données du fichier lié dans la map
+	 * Charge les donnÃ©es du fichier liÃ© dans la map
+	 * @throws FileNotFoundException 
+	 * @throws IOException 
 	 */
-	void load();
+	void load() throws FileNotFoundException, IOException;
 }
