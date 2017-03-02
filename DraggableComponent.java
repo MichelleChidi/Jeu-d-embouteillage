@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 
@@ -37,8 +38,16 @@ public class DraggableComponent extends JComponent {
     protected Cursor draggingCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     /** If sets <b>TRUE</b> when dragging component, it will be painted over each other (z-Buffer change) */
     protected boolean overbearing = false;
+    private int vehicleWidth;
+    private int vehicleHeight;
+    private int lastX;
+    private int lastY;
+    private boolean isRed;
 
-    public DraggableComponent() {
+    public DraggableComponent(int width, int height, boolean red) {
+    	vehicleWidth  = width;
+    	vehicleHeight = height;
+    	isRed         = red;
         addDragListeners();
         setOpaque(true);
         setBackground(new Color(240,240,240));
@@ -50,7 +59,6 @@ public class DraggableComponent extends JComponent {
      *
      * @param g Graphics object as canvas
      */
-    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (isOpaque()) {
@@ -66,14 +74,12 @@ public class DraggableComponent extends JComponent {
         /** This handle is a reference to THIS beacause in next Mouse Adapter "this" is not allowed */
         final DraggableComponent handle = this;
         addMouseMotionListener(new MouseAdapter() {
-
-            @Override
+        	
             public void mouseMoved(MouseEvent e) {
                 anchorPoint = e.getPoint();
                 setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
             public void mouseDragged(MouseEvent e) {
                 int anchorX = anchorPoint.x;
                 int anchorY = anchorPoint.y;
@@ -81,7 +87,13 @@ public class DraggableComponent extends JComponent {
                 Point parentOnScreen = getParent().getLocationOnScreen();
                 Point mouseOnScreen = e.getLocationOnScreen();
                 Point position = new Point(mouseOnScreen.x - parentOnScreen.x - anchorX, mouseOnScreen.y - parentOnScreen.y - anchorY);
-                setLocation(position);
+                if (isRed) {
+                	setLocation(new Point((int) position.getX(), 223));
+                } else {
+                	setLocation(position);
+                }
+                lastX = (int) position.getX();
+                lastY = (int) position.getY();
 
                 //Change Z-Buffer if it is "overbearing"
                 if (overbearing) {
@@ -90,6 +102,90 @@ public class DraggableComponent extends JComponent {
                 }
             }
         });
+        
+        addMouseListener(new MouseListener() {
+
+			public void mouseClicked(MouseEvent e) { }
+			
+			public void mouseEntered(MouseEvent e) { }
+
+			public void mouseExited(MouseEvent e) { }
+
+			public void mousePressed(MouseEvent e) {	}
+
+			public void mouseReleased(MouseEvent e) {
+				int anchorX = anchorPoint.x;
+                int anchorY = anchorPoint.y;
+
+                Point parentOnScreen = getParent().getLocationOnScreen();
+                Point mouseOnScreen = e.getLocationOnScreen();
+                
+                double posX = mouseOnScreen.x - parentOnScreen.x - anchorX;
+                double posY = mouseOnScreen.y - parentOnScreen.y - anchorY;
+                Point position = new Point(getBestCoordX(posX), getBestCoordY(posY) );
+                setLocation(position);
+			}
+        	
+        });
+    }
+    
+    /**
+     * This private method is used to obtain the best X coordonate
+     */
+    private int getBestCoordX(double x) {
+    	int[] bestCoord = {311, 382, 453, 524, 595, 666}; // coordonnées X disponible pour placer le véhicule
+    	
+    	int tmp = (int) Math.abs(bestCoord[0] - x);
+    	int best = 0;
+    	
+    	if (isRed) {
+    		for (int i = 1; i < (bestCoord.length-(vehicleWidth-1)); i++) {
+    			if (Math.abs(bestCoord[i] - x) < tmp) {
+    				tmp = (int) Math.abs(bestCoord[i] - x);
+    				best = i;
+    			}
+    		}
+    		lastX = bestCoord[best];
+    		return bestCoord[best];
+    	}
+    	
+    	if (x >= 230 && x <= 737) { // limites du board
+    		for (int i = 1; i < (bestCoord.length-(vehicleWidth-1)); i++) {
+    			if (Math.abs(bestCoord[i] - x) < tmp) {
+    				tmp = (int) Math.abs(bestCoord[i] - x);
+    				best = i;
+    			}
+    		}
+    		lastX = bestCoord[best];
+    		return bestCoord[best];
+    	}
+    	return lastX;
+    }
+    
+    /**
+     * This private method is used to obtain the best Y coordonate
+     */
+    private int getBestCoordY(double y) {
+    	int[] bestCoord = {81, 152, 223, 294, 366, 438}; // coordonnées Y disponible pour placer le véhicule
+    	
+    	int tmp = (int) Math.abs(bestCoord[0] - y);
+    	int best = 0;
+    	
+    	if (isRed) {
+    		return bestCoord[2];
+    	}
+    	
+    	if (y >= 30 && y <= 507) { // limites du board
+    		for (int i = 1; i < (bestCoord.length-(vehicleHeight-1)); i++) {
+    			if (Math.abs(bestCoord[i] - y) < tmp) {
+    				tmp = (int) Math.abs(bestCoord[i] - y);
+    				best = i;
+    			}
+    		}
+    		lastY = bestCoord[best];
+    		return bestCoord[best];
+    	}
+    	return lastY;
     }
 
 

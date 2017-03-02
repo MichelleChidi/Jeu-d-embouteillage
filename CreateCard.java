@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -129,23 +131,64 @@ public class CreateCard {
 	
 	public void createController() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		effacer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				java.awt.EventQueue.invokeLater(new Runnable() {
+		            public void run() {
+		                loadVehicles();
+		            }
+		        });
+			}
+			
+		});
 	}
 
     public static void loadVehicles() {
         createBoard.removeAll();
        
-        addNewVehicle(redCar, 310, 224, 139, 67);
-        addNewVehicle(getHorizontalTruck(), 20, 20, 207, 66);
-        addNewVehicle(getVerticalTruck(), 90, 110, 66, 207);
-        addNewVehicle(getHorizontalCar(), 50, 345, 139, 67);
-        addNewVehicle(getVerticalCar(), 90, 440, 67, 139);
+        addNewVehicle(redCar, 310, 224, 139, 67, true);
         
+        // initialisation des camions horizontaux
+        for (int i = 0; i < 4; i++) {
+        	addNewVehicle(getHorizontalTruck(), 20, 20, 207, 67, false);
+        }
+        
+        //initialisation des camions verticaux
+        for (int i = 0; i < 4; i++) {
+        	addNewVehicle(getVerticalTruck(), 90, 110, 67, 207, false);
+        }
+        
+        //initialisation des voitures horizontales
+        for (int i = 0; i < 6; i++) {
+        	addNewVehicle(getHorizontalCar(), 50, 345, 139, 67, false);
+        }
+        
+        // initialisation des voitures verticales
+        for (int i = 0; i < 6; i++) {
+        	addNewVehicle(getVerticalCar(), 90, 440, 67, 139, false);
+        }
         createBoard.repaint();
     }
 
-    public static void addNewVehicle(Image img, int posX, int posY, int width, int height) {
+    public static void addNewVehicle(Image img, int posX, int posY, int width, int height, boolean red) {
+    	int vehicleWidth = 0;
+    	int vehicleHeight = 0;
+    	
+    	switch(width) {
+    		case 67 : vehicleWidth = 1; break;
+    		case 139 : vehicleWidth = 2; break;
+    		default : vehicleWidth = 3; break;
+    	}
+    	
+    	switch(height) {
+	    	case 67 : vehicleHeight = 1; break;
+			case 139 : vehicleHeight = 2; break;
+			default : vehicleHeight = 3; break;
+    	}
+    	
         //Creates a draggableImageComponent and adds loaded image
-        DraggableImageComponent comp = new DraggableImageComponent();
+        DraggableImageComponent comp = new DraggableImageComponent(vehicleWidth, vehicleHeight, red);
         createBoard.add(comp);//Adds this component to main container
         comp.setImage(img);//Sets image
         comp.setOverbearing(true);//On click ,this panel gains lowest z-buffer

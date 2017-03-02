@@ -39,8 +39,8 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     private boolean autoSize = false;
     private Dimension autoSizeDimension = new Dimension(0, 0);
 
-    public DraggableImageComponent() {
-        super();
+    public DraggableImageComponent(int width, int height, boolean red) {
+        super(width, height, red);
         setLayout(null);
         setBackground(Color.black);
     }

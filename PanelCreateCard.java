@@ -61,6 +61,17 @@ public class PanelCreateCard extends JPanel {
 	    // ligne séparatrice
 	    g.setColor(Color.BLACK);
 	    g.drawLine(245, 10, 245, 590);
+	   
+	    g.setColor(Color.WHITE);
+	    g.fillRect(800, 10, 450, 585);
+	   
+	    image = null;
+		try {
+			image = ImageIO.read(new File("images/recycle.png"));
+		} catch (IOException e) { }
+		
+		g.drawImage(image, 875, 150, this);
+	    
 
 	    g.finalize();
 	}
