@@ -1,4 +1,4 @@
-package source;
+package master;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,7 +55,7 @@ public class StdCard implements Card {
 			}
 			writer.write(
 			"" + v.getId() + ";" + v.getSize() + ";"  + v.getDirection().toString() + ";" 
-			 + s + "\n"  , 0 , 100);
+			 + s + "\n");
 		}
 		writer.close();
 	}
@@ -87,8 +87,7 @@ public class StdCard implements Card {
 			c1 = elements[3].split(":");
 			c2 = elements[4].split(":");
 			c3 = elements[5].split(":");
-			
-			// Gestion des attributs du véhicule
+			// Gestion des attributs du vï¿½hicule
 			size = Integer.parseInt(elements[1]);
 			if (elements[2].compareTo(Direction.VERTICAL.toString()) == 0) {
 				d = Direction.VERTICAL;
@@ -96,7 +95,7 @@ public class StdCard implements Card {
 				d = Direction.HORIZONTAL;
 			}
 			
-			//gestion des coordonnées
+			//gestion des coordonnï¿½es
 			lC = new ArrayList<Coord>();
 			
 			f1 = Integer.parseInt(c1[0]);
@@ -115,8 +114,13 @@ public class StdCard implements Card {
 				thirdCoord = new StdCoord(t1,t2);
 				lC.add(thirdCoord);
 			}
-			places.put(new StdVehicle(size, d),lC);
-			s = new String(reader.readLine());
+			places.put(new StdVehicle(Integer.parseInt(elements[0]),size, d),lC);
+			System.out.println("Taile et direction " + size + d.toString());
+			for (Coord c : lC) {
+			  System.out.print(" "  + c.getRow() + " " + c.getCol());
+			}
+			System.out.println();
+			s = reader.readLine();
 		}
 		
 		reader.close();
