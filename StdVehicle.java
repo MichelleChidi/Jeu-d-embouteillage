@@ -1,4 +1,4 @@
-package source;
+package master;
 
 import util.Contract;
 
@@ -8,21 +8,21 @@ public class StdVehicle implements Vehicle {
   //ATTRIBUTS
   private int size;
   private Direction direction;  
-  private static int id = 0; 
+  private int id; 
   
   // CONSTRUCTEUR
   
   /**
    * Construire un vÃ©hicule.
    */
-  public StdVehicle(int size, Direction dir) {
+  public StdVehicle(int id ,int size, Direction dir) {
     Contract.checkCondition(TRUCK_SIZE == size || size == CAR_SIZE,
         "Taille invalide");
     Contract.checkCondition(dir != null,
         "direction invalide");    
     this.size = size;
     direction = dir; 
-    id++;
+    this.id = id;
   }
   
   @Override
