@@ -1,4 +1,4 @@
-package source;
+package master;
 
 import util.Contract;
 
@@ -55,6 +55,10 @@ public class StdBoard implements Board {
     columnNb = DEFAULT;
     rowNb = DEFAULT;
     exit = EXIT; 
+    vehicleMap = new HashMap<Vehicle, List<Coord>>();
+    coordMap = new HashMap<Coord, Vehicle>();
+    u = new ArrayDeque<Duo>();
+    r = new ArrayDeque<Duo>();  
   }
   
   /**
