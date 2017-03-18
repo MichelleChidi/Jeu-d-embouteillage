@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
-
 public class StdBoard implements Board {
   
   // ATTRIBUTS
@@ -65,30 +63,9 @@ public class StdBoard implements Board {
     columnNb = DEFAULT;
     rowNb = DEFAULT;
     exit = EXIT;
-    history = new StdHistory<Command>(DEFAULT_HISTORY_SIZE);
+    history = new StdHistory<Command>();
     vehicleMap = new HashMap<Vehicle, List<Coord>>();
     coordMap = new HashMap<Coord, Vehicle>();
-    nbOfPossibleUndo = 0;
-    nbOfPossibleRedo = 0;
-  }
-  
-  /**
-   * Modéliser un plateau de jeu.
-   */
-  public StdBoard(int colNb, int rowNb, Coord exit) {
-    Contract.checkCondition(DEFAULT <= colNb && colNb <= MAX,
-        "Nb de colonne invalid");
-    Contract.checkCondition(DEFAULT <= rowNb && rowNb <= MAX,
-        "Nb de ligne invalid");
-    Contract.checkCondition(isValidCol(exit.getCol()) 
-        && isValidRow(exit.getCol()), "sortie invalide");
-    
-    columnNb = colNb;
-    this.rowNb = rowNb;
-    this.exit = exit;
-    vehicleMap = new HashMap<Vehicle, List<Coord>>();
-    coordMap = new HashMap<Coord, Vehicle>();
-    history = new StdHistory<Command>(DEFAULT_HISTORY_SIZE);
     nbOfPossibleUndo = 0;
     nbOfPossibleRedo = 0;
   }
@@ -96,6 +73,14 @@ public class StdBoard implements Board {
   @Override
   public Coord getExit() {
     return exit;
+  }
+
+  @Override
+  public boolean hasWon() {
+    if (coordMap.get(getExit()).isRed()) {
+      return true;
+    }
+    return false;
   }
   
   @Override
@@ -148,7 +133,7 @@ public class StdBoard implements Board {
     Contract.checkCondition(vehicle != null, "Ce véhicule n'existe pas");
     Contract.checkCondition(coord != null, "Cette coordonnée est nulle");
     return coord.isAlignedWith(vehicleMap.get(vehicle).get(0), vehicle.getDirection()) 
-        && isFree(coord);
+        && checkAllFreeCoords(vehicle, coord);
   }
   
   @Override
@@ -220,9 +205,9 @@ public class StdBoard implements Board {
     card.setFile(file);
     try {
       card.save(vehicleMap);
-    } catch (IOException e) {
+    } catch (IOException exception) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      exception.printStackTrace();
     }
   }
   
@@ -353,5 +338,40 @@ public class StdBoard implements Board {
       return vehicleMap.get(vehicle).get(0).getRow() >= newCoord.getRow() 
           && vehicleMap.get(vehicle).get(0).getCol() == newCoord.getCol();
     }
+  }
+  
+  private boolean checkAllFreeCoords(Vehicle vehicle, Coord coord) {
+    int difference; 
+    if (vehicleMap.get(vehicle).get(0).getRow() != coord.getRow()) {
+      difference = (vehicleMap.get(vehicle).get(0).getRow() - coord.getRow()) - 1;
+    } else {
+      difference = (vehicleMap.get(vehicle).get(0).getCol() - coord.getCol()) - 1;
+    }
+    if (checkForwardDirection(vehicle, coord)) {
+      for (int i = 0; i < difference; i++) {
+        if (vehicle.getDirection() == Direction.VERTICAL) {
+          if (!isFree(new StdCoord(coord.getRow() + 1, coord.getCol()))) {
+            return false; 
+          }
+        } else {
+          if (!isFree(new StdCoord(coord.getRow(), coord.getCol() - 1))) {
+            return false; 
+          }
+        }
+      }
+    } else {
+      for (int i = 0; i < difference; i++) {
+        if (vehicle.getDirection() == Direction.VERTICAL) {
+          if (!isFree(new StdCoord(coord.getRow() - 1, coord.getCol()))) {
+            return false; 
+          }
+        } else {
+          if (!isFree(new StdCoord(coord.getRow(), coord.getCol() + 1))) {
+            return false; 
+          }
+        }
+      }
+    }
+    return true;
   }
 }
