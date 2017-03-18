@@ -39,7 +39,7 @@ public interface Coord {
 
   // CONSTANTES
   static final int FST_INDEX = 0;
-  static final int LAST_INDEX = 11;
+  static final int LAST_INDEX = 5;
      
   // REQUTES
   
