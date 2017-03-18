@@ -13,7 +13,6 @@ import java.util.Set;
  * 
  * @inv
  *      0 <= row <= DEFAULT &&  0 <= col <= DEFAULT
- *      || 0 <= row <= MAX &&  0 <= col <= MAX 
  * 
  * @cons <pre>
  * $ARGS$ int row, int column, Coord coord
@@ -28,8 +27,8 @@ import java.util.Set;
  * @cons <pre>
  * $ARGS$ int row, int col, Coord coord
  * $PRE$ 
- *  0 <= row <= MAX
- *  0 <= col <= MAX
+ *  0 <= row <= DEFAULT
+ *  0 <= col <= DEFAULT
  *  exit.equals(coord)
  * $POST$ 
  *      getExit().equals(coord)
@@ -41,11 +40,6 @@ public interface Board {
   // CONSTANTES
   
   /**
-   * Le nombre maximal de lignes et de colonnes.
-   */
-  int MAX = 12;
-  
-  /**
    * Le nombre de lignes et de colonnes par défaut.
    */
   int DEFAULT = 6;
@@ -55,17 +49,18 @@ public interface Board {
    */
   Coord EXIT = new StdCoord(2, 5); 
   
-  /**
-   * Taille de historique par défaut.
-   */
-  int DEFAULT_HISTORY_SIZE = 5;
-  
   // REQUETES
   
   /**
    * Indique la sortie de l'embouteillage.
    */
   Coord getExit();
+  
+  /**
+   * Indique si le jeu est gagné
+   * c-a-d si la voiture rouge est sur la sortie.
+   */
+  boolean hasWon();
   
   /**
    * retourne le nombre de lignes sur le plateau.
