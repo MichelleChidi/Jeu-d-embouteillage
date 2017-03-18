@@ -13,17 +13,13 @@ package source;
    *  disparaître les éléments postérieurs au curseur. 
    * @inv <pre>
    *     getMaxHeight() > 0
-   *     0 <= getCurrentPosition() <= getEndPosition() <= getMaxHeight()
+   *     0 <= getCurrentPosition() <= getEndPosition() 
    *     getCurrentElement() != null
    *     getCurrentElement() == l'élément à la position getCurrentPosition()
    * </pre>
    * @cons <pre>
-   *     $DESC$ Un historique vide de taille maximale maxHeight.
-   *     $ARGS$ int maxHeight
-   *     $PRE$
-   *         maxHeight > 0
+   *     $DESC$ Un historique vide.
    *     $POST$
-   *         getMaxHeight() == maxHeight
    *         getCurrentPosition() == 0
    *         getEndPosition() == 0 </pre>
    */
@@ -31,11 +27,6 @@ package source;
 public interface History<E> {
       
   // REQUETES
-      
-  /**
-   * La taille maximale de l'historique.
-   */
-  int getMaxHeight();
         
   /**
    * La position courante dans l'historique.
@@ -65,8 +56,7 @@ public interface History<E> {
    * @pre <pre>
    *     elem != null </pre>
    * @post <pre>
-   *     getCurrentPosition() == 
-   *         min(old getCurrentPosition() + 1, getMaxHeight())
+   *     getCurrentPosition() == old getCurrentPosition() + 1
    *     getCurrentElement() == elem
    *     getEndPosition() == getCurrentPosition()
    *     si l'historique était plein, le plus ancien élément a disparu </pre>
