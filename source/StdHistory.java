@@ -9,7 +9,6 @@ public class StdHistory<E> implements History<E> {
     
   // ATTRIBUTS
     
-  private final int maximumHeight; 
   private int currentPosition;
   private int endPosition;
   private Deque<E> undo;    
@@ -20,17 +19,10 @@ public class StdHistory<E> implements History<E> {
   /**
    * .
    */
-  public StdHistory(int maxHeight) {
-    Contract.checkCondition(maxHeight > 0);
-    maximumHeight = maxHeight;
+  public StdHistory() {
     currentPosition = 0;
-    undo = new ArrayDeque<E>(maximumHeight);
-    doIt = new ArrayDeque<E>(maximumHeight);
-  }
-  
-  @Override
-  public int getMaxHeight() {
-    return maximumHeight;
+    undo = new ArrayDeque<E>();
+    doIt = new ArrayDeque<E>();
   }
 
   @Override
@@ -51,11 +43,8 @@ public class StdHistory<E> implements History<E> {
   @Override
   public void add(E elem) {
     Contract.checkCondition(elem != null);
-    if (currentPosition == maximumHeight) {
-      doIt.removeLast();
-    }
-    undo = new ArrayDeque<E>(maximumHeight);
-    currentPosition = Math.min(currentPosition + 1, maximumHeight); 
+    undo = new ArrayDeque<E>();
+    currentPosition = currentPosition + 1; 
     endPosition = currentPosition;
     doIt.addFirst(elem);   
   }
