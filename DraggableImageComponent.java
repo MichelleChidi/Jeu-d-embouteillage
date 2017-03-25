@@ -25,13 +25,12 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 
+import view.CreateCard;
+
 /**
- * This is an extension of Draggable Component with a custom Image for backgraound
- * setting it by <b>setImage</b> method. You can use it as simple Image Panel with
+ * Cette classe est une extension à DraggableComponent qui sert à customiser un composant avec une image
+ * grâce à la méthode <b>setImage</b>. Vous pouvez l'utiliser comme une simple image de Panel avec
  * <b>setDraggable(false)</b>.
- * It implements  ImageObserver for Image loading problems. it repaints itself after
- * image is full loaded.
- *
  */
 public class DraggableImageComponent extends DraggableComponent implements ImageObserver {
 
@@ -39,20 +38,19 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     private boolean autoSize = false;
     private Dimension autoSizeDimension = new Dimension(0, 0);
 
-    public DraggableImageComponent(int width, int height, boolean red) {
-        super(width, height, red);
+    public DraggableImageComponent(CreateCardModel model, int width, int height, boolean red) {
+        super(model, width, height, red);
         setLayout(null);
         setBackground(Color.black);
     }
 
     /**
-     * This overrided method paints image on Component if any. Else it paints a Background color.
-     * If <b>autoSize</b> is TRUE , it paints image with original ration, on a Background Color box
-     * if opaque.
-     * 
+     * Cette méthode dessine une image sur le composant s'il n'y en pas déjà une. Sinon elle
+     * dessine un Background avec une couleur.
+	 * Si <b>autoSize</b> est vrai, l'image sera dessiner son rapport largeur/hauteur sur un rectangle blanc
+	 * de la même taille.
      * @param g
      */
-    @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.clearRect(0, 0, getWidth(), getHeight());
@@ -66,8 +64,7 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     }
 
     /**
-     * It is a simple tecnique to retrieve dimensions of Image, preserving ratio w/h of image
-     * and make a best matching on the parent box.
+     * C'est une simple technique pour redimensionner l'image, tout en garde son ratio l/h.
      * @param source
      * @param dest
      * @return
@@ -89,17 +86,16 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     }
 
     /**
-     * Checks if image is full loaded.
+     * Vérifie si l'image est totalement chargé.
      *
-     * @param img target image
-     * @param infoflags is equal to <b>>ALLBITS</b> when loading is finished
-     * @param x x position
-     * @param y y position
-     * @param w width
-     * @param h height
-     * @return TRUE if image can generates events, FALSE otherwise
+     * @param img l'objet de l'image
+     * @param infoflags est égal à <b>ALLBITS</b> quand le chargement est fini
+     * @param x position x
+     * @param y position y
+     * @param w largeur
+     * @param h hauteur
+     * @return TRUE si l'image peut générer des événements, FALSE sinon
      */
-    @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int w, int h) {
         if (infoflags == ALLBITS) {
             repaint();
@@ -110,7 +106,7 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     }
 
     /**
-     * This method is used to resize component considering w/h ratio of image. 
+     * Cette méthode est utilisé pour redimensionner une image avec sa taille initiale. 
      */
     private void setAutoSizeDimension() {
         if (!autoSize) {
@@ -129,7 +125,7 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     }
 
     /**
-     * It is used to Resize component when it has an AutoSize value setted on TRUE
+     * Cette méthode est utilisé pour redimensionner le composant quand la valeur autoSize est TRUE.
      * @param pixels
      */
     public void grow(int pixels) {
@@ -138,46 +134,46 @@ public class DraggableImageComponent extends DraggableComponent implements Image
     }
 
     /**
-     * Get the value of autoSize
+     * Retourne la valeur de autoSize.
      *
-     * @return the value of autoSize
+     * @return valeur de autoSize
      */
     public boolean isAutoSize() {
         return autoSize;
     }
 
     /**
-     * Set the value of autoSize
+     * Modifie la valeur de autoSize.
      *
-     * @param autoSize new value of autoSize
+     * @param autoSize nouvelle valeur de autoSize
      */
     public void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
     }
 
     /**
-     * Get the value of image
+     * Retourne l'image utilisé.
      *
-     * @return the value of image
+     * @return image utilisé
      */
     public Image getImage() {
         return image;
     }
 
     /**
-     * Set the value of image by String name. Use ToolKit to create image from file.
-     * use setImage(Image image) if you just have an image.
+     * Modifie l'image utilisé en utilisant son chemin d'accès. Utilise ToolKit pour créer l'image dans un fichier.
+     * Il faut utilisé setImage(Image image) s'il y a juste une image.
      *
-     * @param image fileName of image
+     * @param image chemin d'accès de l'image
      */
     public void setImage(String image) {
         setImage(Toolkit.getDefaultToolkit().getImage(image));
     }
 
     /**
-     * Set the value of image
+     * Modifie l'image utilisé.
      *
-     * @param image new value of image
+     * @param image nouvelle image
      */
     public void setImage(Image image) {
         this.image = image;

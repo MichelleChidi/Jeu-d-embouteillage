@@ -16,12 +16,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import model.CreateCardModel;
 import model.DraggableImageComponent;
+import model.StdCreateCardModel;
 
 public class CreateCard {
 
-    public static JFrame frame;
-    public static PanelCreateCard createBoard;
+    private JFrame frame;
+    private static PanelCreateCard createBoard;
+    private static CreateCardModel model;
     private JButton sauvegarder;
 	private JButton effacer;
 	private JButton retour;
@@ -84,8 +87,8 @@ public class CreateCard {
 	    colorVerticalTruck   = 3;
 	    colorHorizontalCar   = 1;
 	    colorVerticalCar     = 3;
-	    
-	    java.awt.EventQueue.invokeLater(new Runnable() {
+
+    	java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 loadVehicles();
             }
@@ -93,7 +96,7 @@ public class CreateCard {
 	}
 	
 	public void createModel() {
-		
+		model = new StdCreateCardModel();
 	}
 	
 	public void createView() {
@@ -134,13 +137,15 @@ public class CreateCard {
 		
 		effacer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				model.clear();
 				java.awt.EventQueue.invokeLater(new Runnable() {
 		            public void run() {
 		                loadVehicles();
 		            }
 		        });
+				System.out.println("Clear");
+				System.out.println(model.toString());
 			}
-			
 		});
 	}
 
@@ -150,24 +155,17 @@ public class CreateCard {
         addNewVehicle(redCar, 310, 224, 139, 67, true);
         
         // initialisation des camions horizontaux
-        for (int i = 0; i < 4; i++) {
-        	addNewVehicle(getHorizontalTruck(), 20, 20, 207, 67, false);
-        }
+        addNewVehicle(getHorizontalTruck(), 20, 20, 207, 67, false);
         
         //initialisation des camions verticaux
-        for (int i = 0; i < 4; i++) {
-        	addNewVehicle(getVerticalTruck(), 90, 110, 67, 207, false);
-        }
+       	addNewVehicle(getVerticalTruck(), 90, 110, 67, 207, false);
         
         //initialisation des voitures horizontales
-        for (int i = 0; i < 6; i++) {
-        	addNewVehicle(getHorizontalCar(), 50, 345, 139, 67, false);
-        }
+        addNewVehicle(getHorizontalCar(), 50, 345, 139, 67, false);
         
         // initialisation des voitures verticales
-        for (int i = 0; i < 6; i++) {
-        	addNewVehicle(getVerticalCar(), 90, 440, 67, 139, false);
-        }
+        addNewVehicle(getVerticalCar(), 90, 440, 67, 139, false);
+        
         createBoard.repaint();
     }
 
@@ -187,18 +185,34 @@ public class CreateCard {
 			default : vehicleHeight = 3; break;
     	}
     	
-        //Creates a draggableImageComponent and adds loaded image
-        DraggableImageComponent comp = new DraggableImageComponent(vehicleWidth, vehicleHeight, red);
-        createBoard.add(comp);//Adds this component to main container
-        comp.setImage(img);//Sets image
-        comp.setOverbearing(true);//On click ,this panel gains lowest z-buffer
+    	// Créer un DraggableImageComponent et ajoute son image
+        DraggableImageComponent comp = new DraggableImageComponent(model, vehicleWidth, vehicleHeight, red);
+        createBoard.add(comp); // Ajoute ce Component sur la frame
+        comp.setImage(img); // Modifie l'image
+        comp.setOverbearing(true); // Avec un click, ce component est prioritaire sur les autres
 
         comp.setSize(width, height);
         comp.setLocation(posX, posY);
         
         createBoard.repaint();
     }
+    
+    public static void addNewHorizontalTruck() {
+    	addNewVehicle(getHorizontalTruck(), 20, 20, 207, 67, false);
+    }
+    
+    public static void addNewVerticalTruck() {
+    	addNewVehicle(getVerticalTruck(), 90, 110, 67, 207, false);
+    }
+    
+    public static void addNewHorizontalCar() {
+    	addNewVehicle(getHorizontalCar(), 50, 345, 139, 67, false);
+    }
 
+    public static void addNewVerticalCar() {
+    	addNewVehicle(getVerticalCar(), 90, 440, 67, 139, false);
+    }
+    
     public static int getRandom(int range) {
         int r = (int) (Math.random() * range) - range;
         return r;
