@@ -27,8 +27,6 @@ public class DraggableComponent extends JComponent {
     private int vehicleHeight;
     private int lastX;
     private int lastY;
-    private int tmpX;
-    private int tmpY;
     private boolean isRed;
     private int nbPlaced;
     private static CreateCardModel model;
@@ -62,6 +60,8 @@ public class DraggableComponent extends JComponent {
     		veh = new StdVehicle(Type.CAR, Direction.VERTICAL);
     	}
     	if (isRed) {
+    		lastX = 311;
+    		lastY = 223;
     		veh = new StdVehicle(Type.RED, Direction.HORIZONTAL);
     		model.addVehicle(veh, new StdCoord(2,0));
     	}
@@ -167,91 +167,88 @@ public class DraggableComponent extends JComponent {
         });
     }
     
-    /**
-     * Cette méthode privé est utilisé pour trouvé la meilleur coordonnée
-     */
-    private int getBestCoordX(double x) {
-    	int[] bestCoord = {311, 382, 453, 524, 595, 666}; // coordonnées X disponible pour placer le véhicule
+    private int[] getBestCoord (double x, double y) {
+    	int[] bestCoordX = {311, 382, 453, 524, 595, 666}; // coordonnées X disponible pour placer le véhicule
+    	int[] bestCoordY = {81, 152, 223, 294, 366, 438}; // coordonnées Y disponible pour placer le véhicule
+    	int[] bestCoord = new int[2];
     	
-    	int tmp = (int) Math.abs(bestCoord[0] - x);
-    	int best = 0;
+    	int tmpX = (int) Math.abs(bestCoordX[0] - x);
+    	int tmpY = (int) Math.abs(bestCoord[0] - y);
+    	int bestX = 0;
+    	int bestY = 0;
     	
+    	// Voiture rouge
     	if (isRed) {
-    		for (int i = 1; i < (bestCoord.length-(vehicleWidth-1)); i++) {
-    			if (Math.abs(bestCoord[i] - x) < tmp) {
-    				tmp = (int) Math.abs(bestCoord[i] - x);
-    				best = i;
-    			}
-    		}
-    		lastX = bestCoord[best];
-    		return lastX;
-    	}
-    	
-    	if (x >= 230 && x <= 737) { // limites du board
-    		for (int i = 1; i < (bestCoord.length-(vehicleWidth-1)); i++) {
-    			if (Math.abs(bestCoord[i] - x) < tmp) {
-    				tmp = (int) Math.abs(bestCoord[i] - x);
-    				best = i;
+    		for (int i = 1; i < (bestCoordX.length-(vehicleWidth-1)); i++) {
+    			if (Math.abs(bestCoordX[i] - x) < tmpX) {
+    				tmpX = (int) Math.abs(bestCoordX[i] - x);
+    				bestX = i;
     			}
     		}
     		
-    		lastX = bestCoord[best];
+    		if (model.isFree(veh, pixelToCoord(bestCoordX[bestX], bestCoordY[2]))) {
+    			bestCoord[0] = bestCoordX[bestX];
+    			bestCoord[1] = bestCoordY[2];
+        		
+        		lastX = bestCoord[0];
+        		lastY = bestCoord[1];
+    		} else {
+    			bestCoord[0] = lastX;
+    			bestCoord[1] = bestCoordY[2];
+    		}
     		
-    		if (nbPlaced == 0) {
-        		createVehicle (vehicleWidth, vehicleHeight, isRed);
-        	}
-    		nbPlaced ++;
-    	} else {
-    		nbPlaced = 0;
-    		lastX = xInitiale();
-    	}
+    		return bestCoord;
+    	} 
     	
-    	return lastX;
-    }
-    
-    /**
-     * Cette méthode privé est utilisé pour trouvé la coordonnée Y
-     */
-    private int getBestCoordY(double x, double y) {
-    	int[] bestCoord = {81, 152, 223, 294, 366, 438}; // coordonnées Y disponible pour placer le véhicule
-    	
-    	int tmp = (int) Math.abs(bestCoord[0] - y);
-    	int best = 0;
-    	
-    	if (isRed) {
-    		tmpY = bestCoord[2];
-    		return bestCoord[2];
-    	}
     	if (x < 230 || x > 738) {
     		if (nbPlaced > 0) {
-    			nbPlaced = 0;
-    			return lastY;
+    			bestCoord[0] = lastX;
+    			bestCoord[1] = lastY;
+    			return bestCoord;
     		} else {
 	    		nbPlaced = 0;
+	    		lastX = xInitiale();
 	    		lastY = yInitiale();
-	    		return lastY;
+	    		bestCoord[0] = lastX;
+	    		bestCoord[1] = lastY;
+	    		return bestCoord;
     		}
     	}
 
-    	if (y >= 30 && y <= 507) { // limites du board
-    		for (int i = 1; i < (bestCoord.length-(vehicleHeight-1)); i++) {
-    			if (Math.abs(bestCoord[i] - y) < tmp) {
-    				tmp = (int) Math.abs(bestCoord[i] - y);
-    				best = i;
+    	// déplacement sur plateau
+    	tmpX = (int) Math.abs(bestCoordX[0] - x);
+    	if (x >= 230 && x <= 737) { // limites du board
+    		for (int i = 1; i < (bestCoordX.length-(vehicleWidth-1)); i++) {
+    			if (Math.abs(bestCoordX[i] - x) < tmpX) {
+    				tmpX = (int) Math.abs(bestCoordX[i] - x);
+    				bestX = i;
     			}
     		}
-    		lastY = bestCoord[best];
-    		nbPlaced ++;
-    		return lastY;
     	}
     	
-    	return lastY;
-    }
+    	tmpY = (int) Math.abs(bestCoordY[0] - y);
+    	if (y >= 30 && y <= 507) { // limites du board
+    		for (int i = 1; i < (bestCoordY.length-(vehicleHeight-1)); i++) {
+    			if (Math.abs(bestCoordY[i] - y) < tmpY) {
+    				tmpY = (int) Math.abs(bestCoordY[i] - y);
+    				bestY = i;
+    			}
+    		}
+    	}
+    		
+		if (model.isFree(veh, pixelToCoord(bestCoordX[bestX], bestCoordY[bestY]))) {
+			lastX = bestCoordX[bestX];
+			lastY = bestCoordY[bestY];
+			
+		}
+		bestCoord[0] = lastX;
+		bestCoord[1] = lastY;	
+		if (nbPlaced == 0) {
+    		createVehicle (vehicleWidth, vehicleHeight, isRed);
+    	}
+		nbPlaced ++;
     
-    private int[] getBestCoord (double x, double y) {
-    	int[] best = {getBestCoordX(x), getBestCoordY(x, y)};
-    	
-    	return best;
+    	return bestCoord;
     }
     
     private Coord pixelToCoord (int x, int y) {
