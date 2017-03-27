@@ -20,15 +20,16 @@ public class MainMenu {
 	private Difficulty difficulty;
 	private Scores scores;
 	private Rules rules;
-	private Options options;
+	private CreateCard createCard;
+	private Game game;
 	
 	private JFrame mainFrame;
-	private JButton level, rulesButton, optionsButton, scoresButton, play;
+	private JButton level, rulesButton, cardButton, scoresButton, play;
 	private JLabel title;
 	
 	public MainMenu(){
 		mainFrame = new JFrame( "Rush Hour" );
-		mainFrame.setPreferredSize( new Dimension( 500, 500 ) );
+		mainFrame.setPreferredSize( new Dimension( 1280, 720 ) );
 		
 		createView();
 		placeComponent();
@@ -61,8 +62,8 @@ public class MainMenu {
 		rulesButton = new JButton( "Règles" );
 		rulesButton.setPreferredSize( buttonSize );
 		
-		optionsButton = new JButton( "Options" );
-		optionsButton.setPreferredSize( buttonSize );
+		cardButton = new JButton( "Créer" );
+		cardButton.setPreferredSize( buttonSize );
 		
 		scoresButton = new JButton( "Scores" );
 		scoresButton.setPreferredSize( buttonSize );
@@ -97,7 +98,7 @@ public class MainMenu {
 			
 			gbc.gridx = 1;
 			gbc.gridy = 1;
-			p.add( optionsButton, gbc );
+			p.add( cardButton, gbc );
 			
 			gbc.gridx = 0;
 			gbc.gridy = 2;
@@ -142,19 +143,23 @@ public class MainMenu {
 			}
 		});
 		
-		optionsButton.addActionListener( new ActionListener(){
+		cardButton.addActionListener( new ActionListener(){
 			public void actionPerformed( ActionEvent e ){
 				mainFrame.getContentPane().removeAll();
 				
-				options = new Options( mainFrame );
-				mainFrame.setContentPane( options.getJFrame().getContentPane() );
+				createCard = new CreateCard( mainFrame );
+				mainFrame.setContentPane( createCard.getJFrame().getContentPane() );
 				mainFrame.repaint();
 			}
 		});
 		
 		play.addActionListener( new ActionListener(){
 			public void actionPerformed( ActionEvent e ){
+				mainFrame.getContentPane().removeAll();
 				
+				game = new Game( mainFrame );
+				mainFrame.setContentPane( game.getJFrame().getContentPane() );
+				mainFrame.repaint();
 			}
 		});
 	}
