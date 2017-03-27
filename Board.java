@@ -111,6 +111,16 @@ public interface Board {
 	 * Indique s'il y a un v√©hicule les coordonn√©es coord est vide.
 	 */
 	boolean isFree(Coord coord);
+	
+	/**
+	 * Indique si le vÈhicule peut Ítre dÈposer
+	 * @param v
+	 * @param coord
+	 * @return
+	 */
+	boolean isFree(Vehicle v, Coord coord);
+	
+	
 
 	/**
 	 * Indique si le v√©hicule v peut se d√©placer sur cette coordonn√©e coord.

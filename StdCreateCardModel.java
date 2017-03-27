@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ public class StdCreateCardModel implements CreateCardModel {
 	 */
 	private Map<Vehicle, Coord> vehicleMap;
 	private Map<Coord, Vehicle> coordMap;
+	private int withoutName;
 	
 	// CONSTRUCTEUR
 	
@@ -27,8 +29,8 @@ public class StdCreateCardModel implements CreateCardModel {
 	
 	// ACCESSEURS 
 	
-	public Set<Vehicle> getAllVehicles() {
-		return vehicleMap.keySet();
+	public Map<Vehicle, Coord> getAllVehicles() {
+		return vehicleMap;
 	}
 
 	public Vehicle getVehicle(Coord coord) {
@@ -58,6 +60,15 @@ public class StdCreateCardModel implements CreateCardModel {
 			}
 		}
 		return test;
+	}
+	
+	public int getNbFileWithoutName() {
+		int i = 1;
+		while (new File("niveaux/perso/" + i + ".lvl").exists()) {
+			i ++;
+		}
+		i ++;
+		return i;
 	}
 	
 	public String toString() {

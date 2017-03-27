@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -16,8 +18,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import model.Card;
 import model.CreateCardModel;
 import model.DraggableImageComponent;
+import model.StdCard;
 import model.StdCreateCardModel;
 
 public class CreateCard {
@@ -143,9 +147,14 @@ public class CreateCard {
 		                loadVehicles();
 		            }
 		        });
-				System.out.println("Clear");
-				System.out.println(model.toString());
 			}
+		});
+		
+		sauvegarder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new CreateFile(model).display();
+			}
+			
 		});
 	}
 

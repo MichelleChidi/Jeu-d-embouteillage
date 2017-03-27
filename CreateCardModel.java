@@ -1,13 +1,13 @@
 package model;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface CreateCardModel {
 
 	/**
 	 * Renvoie l'ensemble de tous les véhicules qui se trouvent sur le plateau.
 	 */
-	Set<Vehicle> getAllVehicles();
+	Map<Vehicle, Coord> getAllVehicles();
 
 	/**
 	 * Renvoie le vehicule dont une partie se trouve à cette coordonnée coord.
@@ -27,6 +27,12 @@ public interface CreateCardModel {
 	 * Indique s'il y a un véhicule les coordonnées coord est vide.
 	 */
 	boolean isFree(Vehicle veh, Coord coord);
+	
+	/**
+	 * Indique le nombre de fichier sans nom
+	 * @return nombre de fichier sans nom
+	 */
+	public int getNbFileWithoutName();
 	
 	/**
 	 * Permet de tester le model en mode console

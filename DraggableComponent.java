@@ -28,6 +28,7 @@ public class DraggableComponent extends JComponent {
     private int lastX;
     private int lastY;
     private boolean isRed;
+    private boolean free;
     private int nbPlaced;
     private static CreateCardModel model;
     private Vehicle veh;
@@ -144,14 +145,10 @@ public class DraggableComponent extends JComponent {
                 		model.removeVehicle(veh, pixelToCoord(lastX,lastY));
                 	}
                 	veh = null;
-                	System.out.println("Suppression 1");
-                	System.out.println(model.toString());
                 	nbPlaced ++;
 				} else {
-					if (nbPlaced > 1 || isRed) {
+					if (nbPlaced > 0 || isRed) {
                 		model.removeVehicle(veh, pixelToCoord(lastX, lastY));
-                		System.out.println("Suppression 2");
-                    	System.out.println(model.toString());
                 	}
 					
 					int[] tab = getBestCoord(posX, posY);
@@ -159,8 +156,6 @@ public class DraggableComponent extends JComponent {
                 	Point position = new Point(tab[0], tab[1]);
                 	setLocation(position);
                 	model.addVehicle(veh, pixelToCoord(tab[0], tab[1]));
-                	System.out.println("Ajout");
-                	System.out.println(model.toString());
                 }
 			}
         	
@@ -200,7 +195,7 @@ public class DraggableComponent extends JComponent {
     		return bestCoord;
     	} 
     	
-    	if (x < 230 || x > 738) {
+    	if (x < 230 || (x > 738 && x < 800)) {
     		if (nbPlaced > 0) {
     			bestCoord[0] = lastX;
     			bestCoord[1] = lastY;
@@ -235,18 +230,23 @@ public class DraggableComponent extends JComponent {
     			}
     		}
     	}
-    		
+    	
+    	free = false;
 		if (model.isFree(veh, pixelToCoord(bestCoordX[bestX], bestCoordY[bestY]))) {
 			lastX = bestCoordX[bestX];
 			lastY = bestCoordY[bestY];
-			
+			free  = true;
 		}
 		bestCoord[0] = lastX;
 		bestCoord[1] = lastY;	
-		if (nbPlaced == 0) {
+		if (nbPlaced == 0 && free) {
     		createVehicle (vehicleWidth, vehicleHeight, isRed);
     	}
-		nbPlaced ++;
+		if (free) {
+			nbPlaced ++;
+		} else {
+			
+		}
     
     	return bestCoord;
     }

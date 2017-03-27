@@ -63,7 +63,7 @@ public class StdBoard implements Board {
 		columnNb = DEFAULT;
 		rowNb = DEFAULT;
 		exit = EXIT;
-		history = new StdHistory<Command>();
+		history = new StdHistory<Command>(10);
 		vehicleMap = new HashMap<Vehicle, Coord>();
 		coordMap = new HashMap<Coord, Vehicle>();
 		nbOfPossibleUndo = 0;
@@ -112,9 +112,30 @@ public class StdBoard implements Board {
 	public Coord getCoord(Vehicle vehicle) {
 		return vehicleMap.get(vehicle);
 	}
-
+	
 	public boolean isFree(Coord coord) {
 		return coordMap.get(coord) == null;
+	}
+
+	public boolean isFree(Vehicle v, Coord coord) {
+		boolean test = true;
+		int row = coord.getRow();
+		int col = coord.getCol();
+		
+		if (v.getDirection() == Direction.HORIZONTAL) {
+			for (int i = 0; i < v.getSize(); i++ ) {
+				if (coordMap.get(new StdCoord(row, col+i)) != null) {
+					test = false;
+				}
+			}
+		} else { // véhicule vertical
+			for (int i = 0; i < v.getSize(); i++ ) {
+				if (coordMap.get(new StdCoord(row+i, col)) != null) {
+					test = false;
+				}
+			}
+		}
+		return test;
 	}
 
 	public boolean canMoveTo(Vehicle vehicle, Coord coord) {
@@ -124,19 +145,16 @@ public class StdBoard implements Board {
 				&& checkAllFreeCoords(vehicle, coord);
 	}
 
-	@Override
 	public boolean isValidCol(int col) {
 		return 0 <= col && col <= getColNb();
 	}
 
-	@Override
 	public boolean isValidRow(int row) {
 		return 0 <= row && row <= getRowNb();
 	}
 
 	// COMMANDES
 
-	@Override
 	public void goForward(Vehicle vehicle, Coord coord) {
 		Contract.checkCondition(canMoveTo(vehicle, coord), "cette action n'est pas possible");
 		Contract.checkCondition(vehicleMap.get(vehicle) != null, "ce vehicule n'existe pas");
@@ -150,7 +168,6 @@ public class StdBoard implements Board {
 		nbOfPossibleUndo += 1;
 	}
 
-	@Override
 	public void goBackwards(Vehicle vehicle, Coord coord) {
 		Contract.checkCondition(canMoveTo(vehicle, coord), "cette action n'est pas possible");
 		Contract.checkCondition(vehicleMap.get(vehicle) != null, "ce vehicule n'existe pas");
@@ -254,7 +271,6 @@ public class StdBoard implements Board {
 		coordMap.put(newCoord, vehicle);
 	}
 
-	@Override
 	public void goBackwardsAux(Vehicle vehicle, Coord coord) {
 		Contract.checkCondition(canMoveTo(vehicle, coord), "cette action n'est pas possible");
 		Contract.checkCondition(vehicleMap.get(vehicle) != null, "ce vehicule n'existe pas");

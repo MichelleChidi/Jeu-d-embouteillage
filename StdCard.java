@@ -58,7 +58,6 @@ public class StdCard implements Card {
 		this.file = file;
 	}
 
-	@Override
 	public void save(Map<Vehicle, Coord> carte) throws IOException {
 		Contract.checkCondition(carte != null, "la carte est nulle");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(getFile()));
@@ -69,7 +68,7 @@ public class StdCard implements Card {
 			StringBuffer string = new StringBuffer();
 			
 			Coord coord = carte.get(v);
-			string.append(coord.getCol() + ":" + coord.getRow());
+			string.append(coord.getRow() + ":" + coord.getCol());
 			if (i != (v.getSize() - 1)) {
 				string.append(";");
 			}
@@ -78,7 +77,6 @@ public class StdCard implements Card {
 		writer.close();
 	}
 
-	@Override
 	public void load() throws IOException, BadSyntaxException {
 		Contract.checkCondition(this.getFile() != null, "Il faut un fichier a charger !");
 		BufferedReader reader = new BufferedReader(new FileReader(this.getFile()));
