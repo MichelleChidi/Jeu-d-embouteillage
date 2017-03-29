@@ -3,31 +3,34 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import model.Card;
 import model.CreateCardModel;
 import model.DraggableImageComponent;
-import model.StdCard;
 import model.StdCreateCardModel;
 
 public class CreateCard {
-
-    private JFrame frame;
     private static PanelCreateCard createBoard;
+	
+    private MainMenu mainMenu;
+    
+    private JFrame mainFrame;
     private static CreateCardModel model;
     private JButton sauvegarder;
 	private JButton effacer;
@@ -43,18 +46,13 @@ public class CreateCard {
 	private static ArrayList<Image> verticalCars;
 	private static ArrayList<Image> horizontalCars;
 	
-	public CreateCard() {
+	public CreateCard( JFrame frame ){
+		mainFrame = frame;
 		initGraphic();
 		createModel();
 		createView();
 		placeComponent();
 		createController();
-	}
-	
-	public void display() {
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
 	}
 	
 	private void initGraphic() {
@@ -107,10 +105,6 @@ public class CreateCard {
 		final int height = 720;
 		final int width  = 1280;
 		
-		frame = new JFrame("Créateur de carte");
-        frame.setPreferredSize(new Dimension(width, height));
-        frame.setLayout(new BorderLayout());
-		
         createBoard = new PanelCreateCard();
         createBoard.setLayout(null);
         createBoard.setPreferredSize(new Dimension(width, height-100));
@@ -126,18 +120,18 @@ public class CreateCard {
 	}
 	
 	public void placeComponent() {
-		frame.add(createBoard, BorderLayout.CENTER);
+		mainFrame.add(createBoard, BorderLayout.CENTER);
 		
 		JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER)); {
 			p.add(sauvegarder);
 			p.add(effacer);
 			p.add(retour);
 		}
-		frame.add(p, BorderLayout.SOUTH);
+		mainFrame.add(p, BorderLayout.SOUTH);
 	}
 	
 	public void createController() {
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		effacer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -150,11 +144,20 @@ public class CreateCard {
 			}
 		});
 		
-		sauvegarder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new CreateFile(model).display();
+		sauvegarder.addActionListener( new ActionListener() {
+			public void actionPerformed( ActionEvent e ) {
+				new CreateFile(model, createBoard).display();
 			}
-			
+		});
+		
+		retour.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				mainFrame.getContentPane().removeAll();
+				
+				mainMenu = new MainMenu( mainFrame );
+				mainFrame.setContentPane( mainMenu.getJFrame().getContentPane() );
+				mainFrame.repaint();
+			}
 		});
 	}
 
@@ -256,14 +259,7 @@ public class CreateCard {
 		return horizontalCars.get(nb);
 	}
 	
-	// MAIN
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new CreateCard().display();
-            }
-        });
+	public JFrame getJFrame(){
+		return mainFrame;
 	}
 }
-
-

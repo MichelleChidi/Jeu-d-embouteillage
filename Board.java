@@ -113,7 +113,7 @@ public interface Board {
 	boolean isFree(Coord coord);
 	
 	/**
-	 * Indique si le v�hicule peut �tre d�poser
+	 * Indique si le v�hicule peut �tre d�poser
 	 * @param v
 	 * @param coord
 	 * @return
@@ -139,6 +139,18 @@ public interface Board {
 	 * Indique si la ligne est valide.
 	 */
 	boolean isValidRow(int row);
+	
+	/**
+	 * Indique la coordonnée du premier véhicule rencontré en reculant
+	 */
+	public Coord getFirstVehicleBefore(Vehicle veh);
+	
+	/**
+	 * Indique la coordonnér du permier véhicule rencontré en avançant
+	 * @param veh
+	 * @return
+	 */
+	public Coord getFirstVehicleAfter(Vehicle veh);
 
 	// COMMANDES
 
@@ -148,7 +160,7 @@ public interface Board {
 	 * @pre vehicle != null coord != null canMoveTo(vehicle, coord)
 	 * @post getVehicle(coord) == v getCoord(vehicle) == c
 	 */
-	// void move(Vehicle vehicle, Coord coord);
+	void moveTo(Vehicle vehicle, Coord coord);
 
 	/**
 	 * Avancer le véhicule aux coordonnées données.
@@ -161,7 +173,7 @@ public interface Board {
 	 * 
 	 * @post coord ∈ vehicleMap.get(vehicle)
 	 */
-	void goForward(Vehicle vehicle, Coord coord);
+	//void goForward(Vehicle vehicle, Coord coord);
 
 	/**
 	 * Méthode auxilliare pour avancer le véhicule aux coordonnées données.
@@ -174,7 +186,7 @@ public interface Board {
 	 * 
 	 * @post coord ∈ vehicleMap.get(vehicle)
 	 */
-	void goForwardAux(Vehicle vehicle, Coord coord);
+	//void goForwardAux(Vehicle vehicle, Coord coord);
 
 	/**
 	 * Reculer le véhicule aux coordonnées données.
@@ -187,8 +199,7 @@ public interface Board {
 	 * 
 	 * @post coord ∈ vehicleMap.get(vehicle)
 	 */
-
-	void goBackwards(Vehicle vehicle, Coord coord);
+	//void goBackwards(Vehicle vehicle, Coord coord);
 
 	/**
 	 * Méthode auxilliare pour reculer le véhicule aux coordonnées données.
@@ -201,8 +212,7 @@ public interface Board {
 	 * 
 	 * @post coord ∈ vehicleMap.get(vehicle)
 	 */
-
-	void goBackwardsAux(Vehicle vehicle, Coord coord);
+	//void goBackwardsAux(Vehicle vehicle, Coord coord);
 
 	/**
 	 * Déplace le véhicule à la coordonnée c1 vers la coordonnée c2.

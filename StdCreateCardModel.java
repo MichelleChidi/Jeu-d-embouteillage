@@ -48,13 +48,13 @@ public class StdCreateCardModel implements CreateCardModel {
 		
 		if (v.getDirection() == Direction.HORIZONTAL) {
 			for (int i = 0; i < v.getSize(); i++ ) {
-				if (coordMap.get(new StdCoord(row, col+i)) != null) {
+				if (coordMap.get(new StdCoord(row, col+i)) != null && coordMap.get(new StdCoord(row, col+i)) != v) {
 					test = false;
 				}
 			}
 		} else { // véhicule vertical
 			for (int i = 0; i < v.getSize(); i++ ) {
-				if (coordMap.get(new StdCoord(row+i, col)) != null) {
+				if (coordMap.get(new StdCoord(row+i, col)) != null && coordMap.get(new StdCoord(row+i, col)) != v) {
 					test = false;
 				}
 			}
@@ -74,19 +74,17 @@ public class StdCreateCardModel implements CreateCardModel {
 	public String toString() {
 		String str = "";
 		char[][] tab = new char[6][6];
-		
-		for (Coord c : coordMap.keySet()) {
-			tab[c.getRow()][c.getCol()] = '*';
-		}
-		
+
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 6; j++) {
-				if (tab[i][j] != '*') {
+				if (coordMap.get(new StdCoord(i, j)) == null) {
 					tab[i][j] = ' ';
+				} else {
+					tab[i][j] = '*';
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < 6; i++) {
 			str += "|";
 			for (int j = 0; j < 6; j++) {
@@ -94,9 +92,10 @@ public class StdCreateCardModel implements CreateCardModel {
 			}
 			str += "\n";
 		}
-		
+
 		return str;
 	}
+
 	
 	// COMMANDES
 	

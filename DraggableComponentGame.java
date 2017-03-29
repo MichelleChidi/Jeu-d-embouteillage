@@ -26,22 +26,22 @@ public class DraggableComponentGame extends JComponent {
     protected boolean overbearing = false;
     private int lastX;
     private int lastY;
+    private Coord lastCoord;
     private boolean isRed;
-    private boolean free;
-    private int nbPlaced;
     private static Board model;
     private Vehicle veh;
 
     public DraggableComponentGame(Board m, Vehicle v, Coord c) {
     	model    = m;
     	veh      = v;
-    	nbPlaced = 0;
     	
     	isRed = veh.isRed();
     	
         addDragListeners();
         setOpaque(true);
         setBackground(new Color(240,240,240));
+        
+        lastCoord = c;
         
         int[] pixel = coordToPixel(c);
         lastX = pixel[0];
@@ -76,13 +76,60 @@ public class DraggableComponentGame extends JComponent {
                 int anchorX = anchorPoint.x;
                 int anchorY = anchorPoint.y;
 
+                int[] bestCoordX = {280, 352, 423, 494, 565, 636}; // coordonnées X disponible pour placer le véhicule
+            	int[] bestCoordY = {81, 152, 223, 294, 366, 438}; // coordonnées Y disponible pour placer le véhicule
+            	int min = 0;
+            	int max = 5;
+            	
+            	Coord before = model.getFirstVehicleBefore(veh);
+            	Coord after  = model.getFirstVehicleAfter(veh);
+            	
+            	if (veh.getDirection() == Direction.HORIZONTAL) {
+            		if (before == null) {
+            			min = bestCoordX[0];
+            		} else {
+            			min = bestCoordX[before.getCol()];
+            		}
+            		
+            		if (after == null) {
+            			max = bestCoordX[5-veh.getSize()];
+            		} else {
+            			max = bestCoordX[after.getCol() - (veh.getSize() - 1)];
+            		}
+            	} else {
+            		if (before == null) {
+            			min = bestCoordY[0];
+            		} else {
+            			min = bestCoordY[before.getCol() + 1];
+            		}
+            		
+            		if (after == null) {
+            			max = bestCoordY[5-veh.getSize()];
+            		} else {
+            			max = bestCoordY[after.getCol() - (veh.getSize() - 1)];
+            		}
+            	}
+            	
+                
                 Point parentOnScreen = getParent().getLocationOnScreen();
                 Point mouseOnScreen = e.getLocationOnScreen();
                 Point position = new Point(mouseOnScreen.x - parentOnScreen.x - anchorX, mouseOnScreen.y - parentOnScreen.y - anchorY);
-                if (isRed) {
-                	setLocation(new Point((int) position.getX(), 223));
+                if (veh.getDirection() == Direction.HORIZONTAL) {
+                	if ((int) position.getX() <= min) {
+            			setLocation(new Point(min, lastY));
+            		} else if ((int) position.getX() >= max) {
+            			setLocation(new Point(max, lastY));
+            		} else {
+            			setLocation(new Point((int) position.getX(),lastY));
+            		}
                 } else {
-                	setLocation(position);
+                	if ((int) position.getY() <= min) {
+            			setLocation(new Point(lastX, min));
+            		} else if ((int) position.getY() >= max) {
+            			setLocation(new Point(lastX, max));
+            		} else {
+            			setLocation(new Point(lastX, (int) position.getY()));
+            		}
                 }
 
                 //Change le Z-Buffer si il est "overbearing"
@@ -90,6 +137,7 @@ public class DraggableComponentGame extends JComponent {
                     getParent().setComponentZOrder(handle, 0);
                     repaint();
                 }
+                repaint();
             }
         });
         
@@ -112,18 +160,79 @@ public class DraggableComponentGame extends JComponent {
                 
                 double posX = mouseOnScreen.x - parentOnScreen.x - anchorX;
                 double posY = mouseOnScreen.y - parentOnScreen.y - anchorY;
-                if (posX >= 800 && !isRed) {
-                	setSize(new Dimension(0,0));
-               
-                	nbPlaced ++;
-				} else {
-					int[] tab = getBestCoord(posX, posY);
-					
-                	Point position = new Point(tab[0], tab[1]);
-                	setLocation(position);
-                }
+                
+                int[] bestCoordX = {280, 352, 423, 494, 565, 636}; // coordonnées X disponible pour placer le véhicule
+            	int[] bestCoordY = {81, 152, 223, 294, 366, 438}; // coordonnées Y disponible pour placer le véhicule
+            	int min = 0;
+            	int max = 5;
+            	
+                Coord before = model.getFirstVehicleBefore(veh);
+            	Coord after  = model.getFirstVehicleAfter(veh);
+            	
+            	if (veh.getDirection() == Direction.HORIZONTAL) {
+            		if (before == null) {
+            			min = bestCoordX[0];
+            		} else {
+            			min = bestCoordX[before.getCol()];
+            		}
+            		
+            		if (after == null) {
+            			max = bestCoordX[5-veh.getSize()];
+            		} else {
+            			max = bestCoordX[after.getCol() - (veh.getSize() - 1)];
+            		}
+            		
+            		if (posX <= min) {
+            			posX = min;
+            		} else if (posX >= max) {
+            			posX = max;
+            		} else {
+            			// rien
+            		}
+            	} else {
+            		if (before == null) {
+            			min = bestCoordY[0];
+            		} else {
+            			min = bestCoordY[before.getCol() + 1];
+            		}
+            		
+            		if (after == null) {
+            			max = bestCoordY[5-veh.getSize()];
+            		} else {
+            			max = bestCoordY[after.getCol() - (veh.getSize() - 1)];
+            		}
+            		
+            		if (posY <= min) {
+            			posY = min;
+            		} else if (posY >= max) {
+            			posY = max;
+            		} else {
+            			//rien
+            		}
+            	}
+            	
+				int[] tab = getBestCoord(posX, posY);
+				
+            	Point position = new Point(tab[0], tab[1]);
+            	setLocation(position);
+            	
+            	Coord newCoord = pixelToCoord(tab[0], tab[1]);
+            	if (veh.getDirection() == Direction.HORIZONTAL) {
+            		if (lastCoord.getCol() - newCoord.getCol() != 0) { // avance
+            			model.moveTo(veh, newCoord);
+            		} else { // sur la même case
+            			// ne pas compter le déplacement
+            		}
+            	} else {
+            		if (lastCoord.getRow() - newCoord.getRow() != 0) { // avance
+            			model.moveTo(veh, newCoord);
+            		} else { // sur la même case
+            			// ne pas compter le déplacement
+            		}
+            	}
+            	
+            	System.out.println(model.toString());
 			}
-        	
         });
     }
     
@@ -137,82 +246,46 @@ public class DraggableComponentGame extends JComponent {
     	int bestX = 0;
     	int bestY = 0;
     	
-    	// Voiture rouge
-    	if (isRed) {
-    		for (int i = 1; i < (bestCoordX.length-(veh.getSize()-1)); i++) {
-    			if (Math.abs(bestCoordX[i] - x) < tmpX) {
-    				tmpX = (int) Math.abs(bestCoordX[i] - x);
-    				bestX = i;
-    			}
-    		}
-    		
-    		if (model.isFree(veh, pixelToCoord(bestCoordX[bestX], bestCoordY[2]))) {
-    			bestCoord[0] = bestCoordX[bestX];
-    			bestCoord[1] = bestCoordY[2];
-        		
-        		lastX = bestCoord[0];
-        		lastY = bestCoord[1];
-    		} else {
-    			bestCoord[0] = lastX;
-    			bestCoord[1] = bestCoordY[2];
-    		}
-    		
-    		return bestCoord;
-    	} 
     	
-    	if (x < 230 || (x > 738 && x < 800)) {
-    		if (nbPlaced > 0) {
-    			bestCoord[0] = lastX;
-    			bestCoord[1] = lastY;
-    			return bestCoord;
-    		} else {
-	    		nbPlaced = 0;
-	    		bestCoord[0] = lastX;
-	    		bestCoord[1] = lastY;
-	    		return bestCoord;
-    		}
-    	}
-
-    	// déplacement sur plateau
-    	tmpX = (int) Math.abs(bestCoordX[0] - x);
-    	if (x >= 230 && x <= 737) { // limites du board
-    		for (int i = 1; i < (bestCoordX.length-(veh.getSize()-1)); i++) {
-    			if (Math.abs(bestCoordX[i] - x) < tmpX) {
-    				tmpX = (int) Math.abs(bestCoordX[i] - x);
-    				bestX = i;
-    			}
-    		}
-    	}
     	
     	tmpY = (int) Math.abs(bestCoordY[0] - y);
-    	if (y >= 30 && y <= 507) { // limites du board
-    		for (int i = 1; i < (bestCoordY.length-(veh.getSize()-1)); i++) {
-    			if (Math.abs(bestCoordY[i] - y) < tmpY) {
-    				tmpY = (int) Math.abs(bestCoordY[i] - y);
-    				bestY = i;
-    			}
-    		}
-    	}
-    	
-    	free = false;
-		if (model.isFree(veh, pixelToCoord(bestCoordX[bestX], bestCoordY[bestY]))) {
-			lastX = bestCoordX[bestX];
-			lastY = bestCoordY[bestY];
-			free  = true;
+		for (int i = 1; i < (bestCoordY.length-(veh.getSize()-1)); i++) {
+			if (Math.abs(bestCoordY[i] - y) < tmpY) {
+				tmpY = (int) Math.abs(bestCoordY[i] - y);
+				bestY = i;
+			}
 		}
-		bestCoord[0] = lastX;
-		bestCoord[1] = lastY;	
-		if (free) {
-			nbPlaced ++;
-		} else {
+		
+		if (veh.getDirection() == Direction.HORIZONTAL) {
+			tmpX = (int) Math.abs(bestCoordX[0] - x);
+			for (int i = 1; i < (bestCoordX.length-(veh.getSize()-1)); i++) {
+				if (Math.abs(bestCoordX[i] - x) < tmpX) {
+					tmpX = (int) Math.abs(bestCoordX[i] - x);
+					bestX = i;
+				}
+			}
 			
+			bestCoord[0] = bestCoordX[bestX];
+			bestCoord[1] = lastY;
+		} else {
+			tmpY = (int) Math.abs(bestCoordY[0] - y);
+			for (int i = 1; i < (bestCoordY.length-(veh.getSize()-1)); i++) {
+				if (Math.abs(bestCoordY[i] - y) < tmpY) {
+					tmpY = (int) Math.abs(bestCoordY[i] - y);
+					bestY = i;
+				}
+			}
+			
+			bestCoord[0] = lastX;
+			bestCoord[1] = bestCoordY[bestY];
 		}
-    
-    	return bestCoord;
+		
+		
+		return bestCoord;
     }
     
 	private int[] coordToPixel(Coord coord) {
-		int[] bestX = {281, 352, 423, 494, 565, 636};
+		int[] bestX = {280, 352, 423, 494, 565, 636};
     	int[] bestY = {81, 152, 223, 294, 366, 438};
     	
     	int[] best = new int[2];
@@ -241,7 +314,8 @@ public class DraggableComponentGame extends JComponent {
     		}
     	}
     	
-    	return new StdCoord(coordY, coordX);
+    	Coord c = new StdCoord(coordY, coordX);
+    	return c;
     }
     
     /**

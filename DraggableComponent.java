@@ -143,19 +143,24 @@ public class DraggableComponent extends JComponent {
                 	}
                 	if (nbPlaced > 0) {
                 		model.removeVehicle(veh, pixelToCoord(lastX,lastY));
+                		System.out.println(model.toString());
                 	}
                 	veh = null;
                 	nbPlaced ++;
 				} else {
 					if (nbPlaced > 0 || isRed) {
                 		model.removeVehicle(veh, pixelToCoord(lastX, lastY));
+                		System.out.println(model.toString());
                 	}
 					
 					int[] tab = getBestCoord(posX, posY);
 					
                 	Point position = new Point(tab[0], tab[1]);
                 	setLocation(position);
-                	model.addVehicle(veh, pixelToCoord(tab[0], tab[1]));
+                	if (posX >= 230) {
+                		model.addVehicle(veh, pixelToCoord(tab[0], tab[1]));
+                		System.out.println(model.toString());
+                	}
                 }
 			}
         	
@@ -195,7 +200,7 @@ public class DraggableComponent extends JComponent {
     		return bestCoord;
     	} 
     	
-    	if (x < 230 || (x > 738 && x < 800)) {
+    	if (x < 230 || (x > 738 && x < 800 && y > 480)) {
     		if (nbPlaced > 0) {
     			bestCoord[0] = lastX;
     			bestCoord[1] = lastY;
