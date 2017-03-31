@@ -1,8 +1,7 @@
 package model;
 
 import cmd.Command;
-import cmd.GoBackwards;
-import cmd.GoForward;
+import cmd.Move;
 import util.Contract;
 
 import java.io.File;
@@ -75,7 +74,10 @@ public class StdBoard implements Board {
 	}
 
 	public boolean hasWon() {
-		if (coordMap.get(getExit()).isRed()) {
+		if (coordMap.get(new StdCoord(2,5)) == null) {
+			return false;
+		}
+		if (coordMap.get(new StdCoord(2,5)).isRed()) {
 			return true;
 		}
 		return false;
@@ -118,30 +120,44 @@ public class StdBoard implements Board {
 	}
 
 	public boolean isFree(Vehicle v, Coord coord) {
-		boolean test = true;
+		Coord c;
 		int row = coord.getRow();
 		int col = coord.getCol();
 
 		if (v.getDirection() == Direction.HORIZONTAL) {
 			for (int i = 0; i < v.getSize(); i++) {
-				if (coordMap.get(new StdCoord(row, col + i)) != null && coordMap.get(new StdCoord(row, col + i)) != v) {
-					test = false;
+				c = new StdCoord(row, col + i);
+				if (! isFree(c) && coordMap.get(c) != v) {
+					return false;
 				}
 			}
 		} else { // véhicule vertical
 			for (int i = 0; i < v.getSize(); i++) {
-				if (coordMap.get(new StdCoord(row + i, col)) != null && coordMap.get(new StdCoord(row + i, col)) != v) {
-					test = false;
+				c = new StdCoord(row + i, col);
+				if (! isFree(c) && coordMap.get(c) != v) {
+					return false;
 				}
 			}
 		}
-		return test;
+		return true;
 	}
 
 	public boolean canMoveTo(Vehicle vehicle, Coord coord) {
 		Contract.checkCondition(vehicle != null, "Ce véhicule n'existe pas");
 		Contract.checkCondition(coord != null, "Cette coordonnée est nulle");
-		return coord.isAlignedWith(vehicleMap.get(vehicle), vehicle.getDirection()) && isFree(vehicle, coord);
+		
+		boolean t = false;
+		
+		if (vehicle.getDirection() == Direction.HORIZONTAL) {
+			t = coord.getCol() <= 5 - (vehicle.getSize() - 1);
+		} else {
+			t = coord.getRow() <= 5 - (vehicle.getSize() - 1);
+		}
+		
+		return coord.isAlignedWith(vehicleMap.get(vehicle), vehicle.getDirection())
+				&& isFree(vehicle, coord)
+				&& checkAllFreeCoords(vehicle, coord)
+				&& t;
 	}
 
 	public boolean isValidCol(int col) {
@@ -156,68 +172,56 @@ public class StdBoard implements Board {
 		Coord c = getCoord(veh);
 		
 		if (veh.getDirection() == Direction.HORIZONTAL) {
-			// le cas du véhicule qui a le coffre sur le bord du plateau
-			if (c.getCol() == 0) {
-				return null;
+			int x = c.getCol() - 1;
+			if (x <= 0 && canMoveTo(veh, new StdCoord(c.getRow(), 0))) {
+				return new StdCoord(c.getRow(), 0);
 			}
-			
-			Coord tmp;
-			for (int x = c.getCol() - 1; x > 0; x--) {
-				if (! isFree(new StdCoord(c.getRow(), x))) {
-					tmp = new StdCoord(c.getRow(), x);
-					return tmp;
-				}
+			while (x > 0 && canMoveTo(veh, new StdCoord(c.getRow(), x))) {
+				x --;
 			}
+			if (! canMoveTo(veh, new StdCoord(c.getRow(), 0))) {
+				x ++;
+			}
+			return new StdCoord(c.getRow(), x);
 		} else {
-			// le cas du véhicule qui a le coffre sur le bord du plateau
-			if (c.getRow() == 0) {
-				return null;
+			int y = c.getRow() - 1;
+			if (y <= 0 && canMoveTo(veh, new StdCoord(0, c.getCol()))) {
+				return new StdCoord(0, c.getCol());
 			}
-			
-			Coord tmp;
-			for (int y = c.getRow() - 1; y > 0; y--) {
-				if (! isFree(new StdCoord(y, c.getCol()))) {
-					tmp = new StdCoord(c.getRow(), y);
-					return tmp;
-				}
+			while (y > 0 && canMoveTo(veh, new StdCoord(y, c.getCol()))) {
+				y --;
 			}
+			if (! canMoveTo(veh, new StdCoord(0, c.getCol()))) {
+				y ++;
+			}
+			return new StdCoord(y, c.getCol());
 		}
-		
-		return null;
 	}
 
 	public Coord getFirstVehicleAfter(Vehicle veh) {
 		Coord c = getCoord(veh);
 		
 		if (veh.getDirection() == Direction.HORIZONTAL) {
-			// le cas du véhicule qui a le coffre sur le bord du plateau
-			if (c.getCol() >= 5) {
-				return null;
+			int x = c.getCol() + 1;
+			if (x >= 5 - (veh.getSize()-1)) {
+				return new StdCoord(c.getRow(), 5 - (veh.getSize()-1));
 			}
-			
-			Coord tmp;
-			for (int x = c.getCol() + veh.getSize(); x < 5; x++) {
-				if (! isFree(new StdCoord(c.getRow(), x))) {
-					tmp = new StdCoord(c.getRow(), x);
-					return tmp;
-				}
+			while (x < 6 - (veh.getSize()-1) && canMoveTo(veh, new StdCoord(c.getRow(), x))) {
+				x ++;
 			}
+			x --;
+			return new StdCoord(c.getRow(), x);
 		} else {
-			// le cas du véhicule qui a le coffre sur le bord du plateau
-			if (c.getRow() >= 5) {
-				return null;
+			int y = c.getRow() + 1;
+			if (y >= 5 - (veh.getSize()-1)) {
+				return new StdCoord(5 - (veh.getSize()-1), c.getCol());
 			}
-			
-			Coord tmp;
-			for (int y = c.getRow() + veh.getSize(); y < 5; y++) {
-				if (! isFree(new StdCoord(y, c.getCol()))) {
-					tmp = new StdCoord(c.getRow(), y);
-					return tmp;
-				}
+			while (y < 6 - (veh.getSize()-1) && canMoveTo(veh, new StdCoord(y, c.getCol()))) {
+				y ++;
 			}
+			y --;
+			return new StdCoord(y, c.getCol());
 		}
-		
-		return null;
 	}
 	
 	public String toString() {
@@ -241,13 +245,13 @@ public class StdBoard implements Board {
 			}
 			str += "\n";
 		}
-
 		return str;
 	}
 
 	// COMMANDES
 
 	public void moveTo (Vehicle veh, Coord coord) {
+		Contract.checkCondition(canMoveTo(veh, coord), "le vehicule ne peut pas y aller !!!");
 		Contract.checkCondition(isFree(veh, coord));
 		Contract.checkCondition(vehicleMap.get(veh) != null, "ce vehicule n'existe pas");
 		
@@ -266,7 +270,7 @@ public class StdBoard implements Board {
 			}
 
 		}
-
+		
 		Coord old = vehicleMap.get(veh);
 		List<Coord> oldCoords = new ArrayList<Coord>();
 		oldCoords.add(old);
@@ -293,39 +297,86 @@ public class StdBoard implements Board {
 			coordMap.put(newCoords.get(i), veh);
 		}
 	}
+	
+	public void moveAux(Vehicle vehicle, Coord coord) {
+		// TODO Auto-generated method stub
+		Coord oldCoord = vehicleMap.get(vehicle);
+		List<Coord> oldCoords = new LinkedList<Coord>();
+		for (Coord c : coordMap.keySet()) {
+			if (coordMap.get(c).equals(vehicle)) {
+				oldCoords.add(c);
+			}
+		}
+		List<Coord> newCoords = new LinkedList<Coord>();
+		if (vehicle.getDirection() == Direction.HORIZONTAL) {
+			// on avance
+			if (oldCoord.getCol() < coord.getCol()) {
+				for (int i = vehicle.getSize() - 1; i >= 1; i--) {
+					Coord newCd = new StdCoord(coord.getRow(), coord.getCol() - i);
+					newCoords.add(newCd);
+				}
+				newCoords.add(coord);
+			} else {
+				// on recule
+				newCoords.add(coord);
+				for (int i = 1; i < vehicle.getSize(); i++) {
+					Coord newCd = new StdCoord(coord.getRow(), coord.getCol() + i);
+					newCoords.add(newCd);
+				}
+			}
+		} else {
+			// on avance
+			if (oldCoord.getRow() < coord.getRow()) {
+				for (int i = vehicle.getSize() - 1; i >= 1; i--) {
+					Coord newCd = new StdCoord(coord.getRow() - i, coord.getCol());
+					newCoords.add(newCd);
+				}
+				newCoords.add(coord);
+			} else {
+				newCoords.add(coord);
+				for (int i = 1; i < vehicle.getSize(); i++) {
+					Coord newCd = new StdCoord(coord.getRow() + i, coord.getCol());
+					newCoords.add(newCd);
+				}
+			}
+		}
+		vehicleMap.remove(vehicle);
+		vehicleMap.put(vehicle, newCoords.get(0));
+		for (int i = 0; i < oldCoords.size(); i++) {
+			coordMap.remove(oldCoords.get(i));
+		}
+		for (int i = 0; i < newCoords.size(); i++) {
+			coordMap.put(newCoords.get(i), vehicle);
+		}
+	}
 
 	public void placeVehicles(Card card) {
 		Contract.checkCondition(card != null);
 		vehicleMap.clear();
 		coordMap.clear();
-		vehicleMap.putAll(card.getPlaces());
+		
+		for (Vehicle veh : card.getPlaces().keySet()) {
+			vehicleMap.put(veh, card.getPlaces().get(veh));
+		}
 
 		List<Coord> coords;
 		for (Vehicle vehicle : vehicleMap.keySet()) {
 			coords = new ArrayList<Coord>();
-			int width = 1;
-			int height = 1;
 
-			if (vehicle.getDirection() == Direction.HORIZONTAL) { // véhicule
-																	// horizontal
-				width = vehicle.getSize();
-			} else { // véhicule vertical
-				height = vehicle.getSize();
-			}
-
-			coords.add(vehicleMap.get(vehicle));
-			if (width != 1) { // véhicule horizontal
-				coords.add(new StdCoord(coords.get(0).getRow(), coords.get(0).getCol() + 1));
-				if (width == 3) {
-					coords.add(new StdCoord(coords.get(0).getRow(), coords.get(0).getCol() + 2));
+			Coord c = vehicleMap.get(vehicle);
+			coords.add(c);
+			if (vehicle.getDirection() == Direction.HORIZONTAL) { // véhicule horizontal
+				coords.add(new StdCoord(c.getRow(), c.getCol() + 1));
+				if (vehicle.getSize() == 3) {
+					coords.add(new StdCoord(c.getRow(), c.getCol() + 2));
 				}
 			} else { // véhicule vertical
-				coords.add(new StdCoord(coords.get(0).getRow() + 1, coords.get(0).getCol()));
-				if (height == 3) {
-					coords.add(new StdCoord(coords.get(0).getRow() + 2, coords.get(0).getCol()));
+				coords.add(new StdCoord(c.getRow() + 1, c.getCol()));
+				if (vehicle.getSize() == 3) {
+					coords.add(new StdCoord(c.getRow() + 2, c.getCol()));
 				}
 			}
-
+			
 			for (Coord coord : coords) {
 				coordMap.put(coord, vehicle);
 			}
@@ -361,31 +412,27 @@ public class StdBoard implements Board {
 	}
 
 	// OUTILS
-	/**
-	 * Indique si le mouvement goBackwards (reculer) est possible.
-	 */
-	private boolean checkBackwardsDirection(Vehicle vehicle, Coord newCoord) {
-		assert vehicle != null && newCoord != null;
-		if (vehicle.getDirection() == Direction.HORIZONTAL) {
-			return vehicleMap.get(vehicle).getRow() == newCoord.getRow()
-					&& vehicleMap.get(vehicle).getCol() >= newCoord.getCol();
-		} else {
-			return vehicleMap.get(vehicle).getRow() <= newCoord.getRow()
-					&& vehicleMap.get(vehicle).getCol() == newCoord.getCol();
-		}
-	}
-
-	/**
-	 * Indique si le mouvement goForward (avancer) est possible.
-	 */
-	private boolean checkForwardDirection(Vehicle vehicle, Coord newCoord) {
-		assert vehicle != null && newCoord != null;
-		if (vehicle.getDirection() == Direction.HORIZONTAL) {
-			return vehicleMap.get(vehicle).getRow() == newCoord.getRow()
-					&& vehicleMap.get(vehicle).getCol() <= newCoord.getCol();
-		} else {
-			return vehicleMap.get(vehicle).getRow() >= newCoord.getRow()
-					&& vehicleMap.get(vehicle).getCol() == newCoord.getCol();
-		}
-	}
+	public boolean checkAllFreeCoords(Vehicle vehicle, Coord coord) {
+		 if (vehicle.getDirection() == Direction.HORIZONTAL) {
+			 Coord c = vehicleMap.get(vehicle);
+			 int col = c.getCol() + (vehicle.getSize()- 1);
+			 for (int i = col + 1; i <= coord.getCol(); i++) {
+				 Coord next = new StdCoord(c.getRow(), i);
+				 if (!isFree(next)) {
+					 return false;
+				 }
+			 }
+		 } else {
+			 Coord c = vehicleMap.get(vehicle);
+			 int row = c.getRow() + (vehicle.getSize()- 1);
+			 for (int i = (row +1); i <= coord.getRow(); i++) {
+				 Coord next = new StdCoord(i,c.getCol());
+				 if (!isFree(next)) {
+					 return false;
+				 }
+			 }
+		 }
+		 
+		 return true;
+	 }
 }
